@@ -32,8 +32,7 @@ class Trident():
     #We use strings for opcodes because Python doesn't have native ternary or
     #base 27 support. 
     opcode = "0"
-    #flag register
-    flag = [0,0,0]
+    flag = [0,0]
     #9 six-trit (1 Tryte) registers
     registers = [0,0,0,0,0,0,0,0,0]
     #program counter
@@ -74,7 +73,6 @@ class Trident():
         x = True
         try:
             while x == True:
-                #screen = pygame.display.set_mode((243,243))
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             pygame.quit()
@@ -193,6 +191,8 @@ class Trident():
             tup1 = convert(operand1,3,10)
             op1 = int(''.join(map(str, tup1)))
             Trident.registers[0] = Trident.registers[0] - Trident.registers[op1]
+            if Trident.registers[0] < Trident.registers[op1]:
+                flag[0] = 1
             Trident.pc = Trident.pc + 2
         #CP
         elif tribble == "110":
@@ -271,20 +271,26 @@ class Trident():
             yloc = y + pixel_offset
             while row < rows_high:
                 yloc = yloc - 1
-                while pixel_offset < 9:
+                cur_row = Trident.memory[row + start_addr]
+                cur_tup = convert(cur_row,10,3)
+                str_row = "".join(map(str,cur_tup))
+                while len(str_row) < 6:
+                    str_row = ''.join(("0",str_row))
+                while pixel_offset < 6:
                     xloc = xloc + 1
-                    color = screen.get_at((xloc,yloc))[:3]
-                    if color == (0,0,0):
+                    color = str_row[pixel_offset]
+                    #print(color)
+                    if color == "0":
                         value = 0
-                    elif color == (255,255,255):
+                    elif color == "2":
                         value = 2
-                    elif color == (128,128,128):
+                    elif color == "1":
                         value = 1
                     pixel_offset = pixel_offset + 1
                     Trident.pygame_draw(can_draw,value,xloc,yloc)
                 row = row + 1
-                xloc = xloc - 9
-                pixel_offset = pixel_offset - 9
+                xloc = xloc - 6
+                pixel_offset = pixel_offset - 6
             can_draw = False
             Trident.pc = Trident.pc + 4
         #LDM
@@ -315,7 +321,6 @@ class Trident():
             op1 = int(''.join(map(str, tup1)))
             keynum = Trident.handle_keys()
             Trident.registers[op1] = keynum
-            print(Trident.registers[op1])
             Trident.pc = Trident.pc + 2
                 
         else:
