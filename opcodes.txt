@@ -84,7 +84,7 @@ appreciated.
 			 specified registers are equal.
 
 201 rrrrrr [PUSH] - Pushes the value of the register onto the
-		    stack. Thestack pointer is 
+		    stack. The stack pointer is 
 		    incremented by 1.
 
 202 rrrrrr [POP] - Pops the value from the stack pointer into 
@@ -112,3 +112,7 @@ appreciated.
 
 221 rrrrrr [KEY] - Wait for a key press, then store the value
 		   of the key into register rrrrrr.
+
+222 ffffff llllll llllll - Jumps to address llllll llllll if 
+			   flag ffffff is set. Flags are 
+			   labled as 000000 - 000002.

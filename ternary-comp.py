@@ -32,9 +32,8 @@ class Trident():
     #We use strings for opcodes because Python doesn't have native ternary or
     #base 27 support. 
     opcode = "0"
-    flag = [0,0]
     #9 six-trit (1 Tryte) registers
-    registers = [0,0,0,0,0,0,0,0,0]
+    registers = [0,0,0,0,0,0,0,0,0,[0,0,0]]
     #program counter
     pc = 0
     pygame_keys = ["backspace","return","space","0","1","2",
@@ -93,7 +92,7 @@ class Trident():
         #program starts here
         Trident.pc = 729  #Trytes here, not trits
         #opcode = "0"
-        Trident.flag = [0,0,0]
+        Trident.registers = [0,0,0,0,0,0,0,0,0,[0,0,0]]
         Trident.sp = 0
         Trident.memory = [0]*6813
         #Initialize fonts and/or OS, whatever the system should have built in
@@ -112,6 +111,9 @@ class Trident():
         operand1 = Trident.memory[Trident.pc + 1]
         operand2 = Trident.memory[Trident.pc + 2]
         operand3 = Trident.memory[Trident.pc + 3]
+
+        #flags
+        flags = Trident.registers[9]
         #And now, the long if-else chain!
 
         #000 = JP, or "Jump". Operand xxxxxx is loaded to the program counter.
@@ -179,12 +181,13 @@ class Trident():
             op1 = int(''.join(map(str, tup1)))
             if Trident.registers[0] + Trident.registers[op1] <= 728:
                 Trident.registers[0] = Trident.registers[0] + Trident.registers[op1]
+                flags[2] = 0
             else:
                 last_tryte3 = int(str(operand1)[-6:])
                 last_tryte_tup = convert(last_tryte3,3,10)
                 last_tryte = int(''.join(map(str, last_tryte_tup)))
                 Trident.registers[0] = last_tryte
-                flag[0] = 2
+                flags[2] = 2
             Trident.pc = Trident.pc + 2
         #SUB
         elif tribble == "102":
@@ -192,12 +195,16 @@ class Trident():
             op1 = int(''.join(map(str, tup1)))
             Trident.registers[0] = Trident.registers[0] - Trident.registers[op1]
             if Trident.registers[0] < Trident.registers[op1]:
-                flag[0] = 1
+                flags[2] = 2
+            else:
+                flags[2] = 0
             Trident.pc = Trident.pc + 2
         #CP
         elif tribble == "110":
             if int(convert(operand1)) == Trident.registers[0]:
-                flag[1] = 1
+                flags[1] = 2
+            else:
+                flags[1] = 0
             Trident.pc = Trident.pc + 2
         #INC
         elif tribble == "111":
@@ -322,6 +329,18 @@ class Trident():
             keynum = Trident.handle_keys()
             Trident.registers[op1] = keynum
             Trident.pc = Trident.pc + 2
+        #JC
+        elif tribble == "222":
+            tup1 = convert(operand1,3,10)
+            op1 = int(''.join(map(str, tup1)))
+            tup2 = convert(operand2,3,10)
+            op2 = int(''.join(map(str, tup2)))
+            tup3 = convert(operand3,3,10)
+            op3 = int(''.join(map(str, tup3)))
+            if flags[op1] == 2:
+                addr = op2 + op3
+                Trident.pc = addr
+            Trident.pc = Trident.pc + 4
                 
         else:
             print("Unknown opcode")
