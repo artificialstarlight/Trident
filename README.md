@@ -2,10 +2,10 @@
 Ternary computer emulator written in Python
 
 # Usage
-Have Python 3.x installed, as well as Pygame. This is meant to work on Windows computers.
-Navigate to the folder where you put ternary-comp.py
-Run "python ternary-comp.py FILENAME.tri" from cmd
-Make sure ternary-comp.py and logic_and_base_conversion.py are in the same folder
+
+Run .\ternary-comp.exe FILENAME.tri
+Or drag the filename.tri over the .exe. Optional argument DEBUG for..debugging .tri programs.
+Like this: .\ternary-comp.exe FILENAME.tri DEBUG
 
 # Documentation
 See "opcodes.txt" for documentation on the machine instruction Trident uses.
