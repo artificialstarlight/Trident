@@ -18,7 +18,3 @@ keyboard-test.tri ends the program when a key is pressed.
 # Assembler
 
 Is a WIP. It is meant to convert instructions into valid Trident machine code. Hasn't been updated, do not reccommend using as of now.
-
-# Windows Defender says this is a virus!
-
-The source code is *right there*. It is not a virus, you can look through it if you want.
