@@ -1,3 +1,14 @@
+"""
+Hello! This is an 'assembler' meant to convert abbreviated instructions
+into valid ternary opcodes, and place them on one line, no spaces.
+It does this with find-and-replace, so there can be errors in the
+output code if, for example, you comment certian things such as names of
+instructions. Other than that, it works. It even checks the file at the end
+to see if there are any errors that occurred in this way! Isn't that nice :D
+
+"""
+
+
 import sys
 import re
 

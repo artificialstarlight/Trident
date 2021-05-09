@@ -13,15 +13,25 @@ future fontset and/or simple OS.
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
+#imports go here.
+#We use pygame to simulate the screen and handle the keyboard.
+#logic_and_base_conversion contains a useful module, baseconvert,
+#as well as some functions that make ternary base conversion easy.
+#The pkg_resources is needed for building to exe with pyinstaller
 from logic_and_base_conversion import *
 from pygame.locals import *
 import pygame
 import sys
+#import pkg_resources.py2_warn
 
+#Initialize the pygame screen
+#Make the background color black, set it to the
+#right dimensions (243x243), all that
 pygame.init()
 background_colour = (0,0,0)
-screen = pygame.display.set_mode((243,243))
+screen = pygame.display.set_mode((243,243),pygame.NOFRAME)
 screen.fill(background_colour)
+
 #The main class for the emulator
 class Trident():
     #memory, in trits
@@ -36,17 +46,21 @@ class Trident():
     registers = [0,0,0,0,0,0,0,0,0,[0,0,0]]
     #program counter
     pc = 0
+    #The keys of the keyboard that Trident can recognize
     pygame_keys = ["backspace","return","space","0","1","2",
                    "3","4","5","6","7","8","9","a",
-                   "b","c","d","e","f","g","h","i","l","m",
+                   "b","c","d","e","f","g","h","i","j","k","l","m",
                    "n","o","p","q","r","s","t","u","v",
                    "w","x","y","z"]
     
 
+    #Loads the .tri file. Prints debug message if
+    #debug is on.
     def load_file(filename,debug_status):
         print("File Loading")
         ternary = open(filename, "r").read()
         i = 0
+        #reads the file a tryte at a time
         for k in range(0,len(ternary),6):
             tryte = ternary[k:k+6]
             Trident.memory[i+729] = tryte
@@ -54,19 +68,29 @@ class Trident():
                 print("Loaded " + str(tryte) + " into " + str(i+729))
             i = i + 1
         return i
-    
+
+    #This handles drawing to the screen.
+    #Is used by the DRW command.
+    #Where can_draw is a boolean and x,y are coordinates.
+    #value is the trit of memory at the location.
     def pygame_draw(can_draw,value,x,y):
-        print("Drawing...")
+        #print("Drawing...")
         if can_draw:
+            #Ternary XORs the value from the DRW command
+            #with the value of the pixel on the screen.
+            #0 = white, 1 = grey, 2 = black
             if value == 0:
                 screen.set_at((x,y),(255,255,255))
             elif value == 1:
                 screen.set_at((x,y),(128,128,128))
             else:
                 screen.set_at((x,y),(0,0,0))
+            #update the screen
             pygame.display.flip()
-            #return
-        
+
+    #Deals with the keyboard and keys used by Trident
+    #What this does is, it gets the name of the key
+    #which is pressed and returns it. 
     def handle_keys():
         c = 0
         x = True
@@ -112,17 +136,18 @@ class Trident():
         operand2 = Trident.memory[Trident.pc + 2]
         operand3 = Trident.memory[Trident.pc + 3]
 
-        #flags
+        #make it easier to use flags
         flags = Trident.registers[9]
+        
         #And now, the long if-else chain!
 
-        #000 = JP, or "Jump". Operand xxxxxx is loaded to the program counter.
+        #000 = JP, or "Jump".
         #See opcode documentation for more details
         if tribble == "000":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            tup2 = convert(operand2,3,10)
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
+            str2 = convert(operand2,3,10)
+            op2 = int(str2)
             addr = op1 + op2
             Trident.pc = addr
         #001- Logical AND 
@@ -139,20 +164,20 @@ class Trident():
             Trident.pc = Trident.pc + 2
         #NOT
         elif tribble == "011":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             unary_op("NOT",Trident.registers[op1])
             Trident.pc = Trident.pc + 2
         #PTI
         elif tribble == "012":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             unary_op("PTI",registers[op1])
             Trident.pc = Trident.pc + 2
         #NTI
         elif tribble == "020":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             unary_op("NTI",registers[op1])
             Trident.pc = Trident.pc + 2
         #SUM
@@ -161,24 +186,24 @@ class Trident():
             Trident.pc = Trident.pc + 2
         #LDR
         elif tribble == "022":
-            tup1 = convert(operand1,3,10)
-            tup2 = convert(operand2,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(operand1,3,10)
+            str2 = convert(operand2,3,10)
+            op1 = int(str1)
+            op2 = int(str2)
             Trident.registers[op1] = Trident.registers[op2]
             Trident.pc = Trident.pc + 3
         #LD
         elif tribble == "100":
-            tup1 = convert(operand1,3,10)
-            tup2 = convert(operand2,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(str(operand1),3,10)
+            str2 = convert(str(operand2),3,10)
+            op1 = int(str1)
+            op2 = int(str2)
             Trident.registers[op1] = op2
             Trident.pc = Trident.pc + 3
         #ADD
         elif tribble == "101":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             if Trident.registers[0] + Trident.registers[op1] <= 728:
                 Trident.registers[0] = Trident.registers[0] + Trident.registers[op1]
                 flags[2] = 0
@@ -208,14 +233,14 @@ class Trident():
             Trident.pc = Trident.pc + 2
         #INC
         elif tribble == "111":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             Trident.registers[op1] = Trident.registers[op1] + 1
             Trident.pc = Trident.pc + 2
         #DEC
         elif tribble == "112":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             Trident.registers[op1] = Trident.registers[op1] - 1
             Trident.pc = Trident.pc + 2
         #NOP
@@ -228,33 +253,33 @@ class Trident():
             Trident.pc = Trident.pc + 2
         #SNE
         elif tribble == "122":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            tup2 = convert(operand2,3,10)
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
+            str2 = convert(operand2,3,10)
+            op2 = int(str2)
             if registers[op1] != op2:
                 pass
             Trident.pc = Trident.pc + 3
         #SE
         elif tribble == "200":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            tup2 = convert(operand2,3,10)
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
+            str2 = convert(operand2,3,10)
+            op2 = int(str2)
             if Trident.registers[op1] == Trident.registers[op2]:
                 pass
             Trident.pc = Trident.pc + 3
         #PUSH
         elif tribble == "201":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             Trident.memory[Trident.sp] = Trident.registers[op1]
             Trident.sp = Trident.sp - 1
             Trident.pc = Trident.pc + 2
         #POP
         elif tribble == "202":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             Trident.registers[op1] = Trident.memory[Trident.sp]
             Trident.sp = Trident.sp + 1
             Trident.pc = Trident.pc + 2
@@ -265,12 +290,12 @@ class Trident():
         #DRW
         elif tribble == "211":
             can_draw = True 
-            xtup = convert(operand1,3,10)
-            x = int(''.join(map(str, xtup))) 
-            ytup = convert(operand2,3,10)
-            y = int(''.join(map(str, ytup))) 
-            rows_high_tup = convert(operand3,3,10)
-            rows_high = int(''.join(map(str, rows_high_tup)))
+            xstr = convert(operand1,3,10)
+            x = int(xstr) 
+            ystr = convert(operand2,3,10)
+            y = int(ystr) 
+            rows_high_str = convert(operand3,3,10)
+            rows_high = int(rows_high_str)
             start_addr = Trident.registers[8] + Trident.registers[7]
             row = 0
             pixel_offset = 0
@@ -279,14 +304,12 @@ class Trident():
             while row < rows_high:
                 yloc = yloc - 1
                 cur_row = Trident.memory[row + start_addr]
-                cur_tup = convert(cur_row,10,3)
-                str_row = "".join(map(str,cur_tup))
+                str_row = convert(str(cur_row),10,3)
                 while len(str_row) < 6:
                     str_row = ''.join(("0",str_row))
                 while pixel_offset < 6:
                     xloc = xloc + 1
                     color = str_row[pixel_offset]
-                    #print(color)
                     if color == "0":
                         value = 0
                     elif color == "2":
@@ -302,41 +325,41 @@ class Trident():
             Trident.pc = Trident.pc + 4
         #LDM
         elif tribble == "212":
-            tuplocation1 = convert(operand1,3,10)
-            tuplocation2 = convert(operand2,3,10)
-            tupendreg = convert(operand3,3,10)
-            location1 = int(''.join(map(str, tuplocation1)))
-            location2 = int(''.join(map(str, tuplocation2)))
+            strlocation1 = convert(operand1,3,10)
+            strlocation2 = convert(operand2,3,10)
+            strendreg = convert(operand3,3,10)
+            location1 = int(strlocation1)
+            location2 = int(strlocation2)
             loc = location1 + location2
-            endreg = int(''.join(map(str, tupendreg)))
+            endreg = int(strendreg)
             for j in range(endreg):
                 Trident.memory[loc + j] = Trident.registers[j]
                 #print("mem[loc+j] = " + str(Trident.memory[loc+j]))
             Trident.pc = Trident.pc + 4
         #LDS
         elif tribble == "220":
-            tup1 = convert(operand1,3,10)
-            tup2 = convert(operand2,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            op2 = int(''.join(map(str, tup2)))
+            str1 = convert(operand1,3,10)
+            str2 = convert(operand2,3,10)
+            op1 = int(str1)
+            op2 = int(str2)
             addr = op1+op2
             Trident.sp = addr
             Trident.pc = Trident.pc + 3
         #KEY
         elif tribble == "221":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
             keynum = Trident.handle_keys()
             Trident.registers[op1] = keynum
             Trident.pc = Trident.pc + 2
         #JC
         elif tribble == "222":
-            tup1 = convert(operand1,3,10)
-            op1 = int(''.join(map(str, tup1)))
-            tup2 = convert(operand2,3,10)
-            op2 = int(''.join(map(str, tup2)))
-            tup3 = convert(operand3,3,10)
-            op3 = int(''.join(map(str, tup3)))
+            str1 = convert(operand1,3,10)
+            op1 = int(str1)
+            str2 = convert(operand2,3,10)
+            op2 = int(str2)
+            str3 = convert(operand3,3,10)
+            op3 = int(str3)
             if flags[op1] == 2:
                 addr = op2 + op3
                 Trident.pc = addr
