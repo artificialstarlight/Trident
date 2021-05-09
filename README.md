@@ -14,7 +14,7 @@ See "opcodes.txt" for documentation on the machine instruction Trident uses.
 
 Any file you give Trident which contains machine code must have the code all on one line, no spaces.
 
-The included .tri files are tests. draw-test.tri should draw a block sprite. a2.tri should draw a weird looking, small, squareish sprite.
+The included .tri files are tests. draw-test.tri should draw a block sprite. 
 keyboard-test.tri ends the program when a key is pressed.
 
 # Assembler
