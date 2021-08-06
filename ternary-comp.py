@@ -4,9 +4,6 @@ This is a [WIP] emulator of Trident, a simple ternary computer
 inspired by the (binary) CHIP-8 and z80.
 It should have a set of instructions when finished, 6813 trytes of memory,
 9 six-trit registers, and one flag register.
-
-Trytes 0-729 are reserved for important things like a possible
-future fontset and/or simple OS.
 """
 
 #hides the annoying pygame welcome message
