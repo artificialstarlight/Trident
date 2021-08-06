@@ -4,21 +4,24 @@
 Opcodes are one tryte (6 trits) and usually have a 1-3 tryte
 operand, or argument(s).
 
-They must be preceded by 3 leading zeroes, to make the
+Opcodes must be preceded by 3 leading zeroes when writing code, to make the
 instruction a tryte. They are omitted in this documentation
 for formatting purposes.
+
+If you are using the Python assembler, you may use the abbreviations listed instead of 
+the opcode numbers.
 
 There are 9 registers, 0-8, each a tryte. Register 0 acts as
 an accumulator, while register 8 is used like an index.
 
 There is a one tribble (3-trit) flag register. Flags are
-C- carry/borrow
-Z- Zero Flag
 X- Unused
+Z- Zero Flag
+C- Carry/Borrow
 
-6813 trytes of memory total, 729 trytes are reserved for the
-system/any future things I might want to put in there, like
-a fontset or simple OS. As of now, it's kinda empty.
+6813 trytes of memory total, the program counter starts at tryte 13, that is,
+the 13th tryte of memory in the system. It is reccomended that you keep track of
+how many trytes your program takes up, as well as any subroutines.
 
 There are likely to be contradictions and/or mistakes in this
 instruction set that I did not notice. Feedback is 
@@ -27,7 +30,7 @@ appreciated.
 ************************************************************
 
 000 llllll llllll [JP] - Jumps to the specified address. Operand 
-		  xxxxxx is loaded to the program counter.
+		  llllll llllll is loaded to the program counter.
 		  The next instruction is fetched from the
 		  location designated by the new contents of
 		  the PC.
@@ -59,10 +62,10 @@ appreciated.
 			 specified register.
 
 101 rrrrrr [ADD] - Contents of register R are added to
-		   register 0.
+		   register 0. C/B flag is set if a carry occurs.
 
 102 rrrrrr [SUB] - Contents of register R are subtracted from
-		   register 0.
+		   register 0. C/B flag is set if a borrow occurs.
 
 110 xxxxxx [CP] - Contents of the operand are compared with
 		  the contents of Register 0. If it is true,
@@ -113,6 +116,6 @@ appreciated.
 221 rrrrrr [KEY] - Wait for a key press, then store the value
 		   of the key into register rrrrrr.
 
-222 ffffff llllll llllll - Jumps to address llllll llllll if 
-			   flag ffffff is set. Flags are 
+222 ffffff llllll llllll [JC] - Jumps to address llllll llllll
+			   if flag ffffff is set. Flags are 
 			   labled as 000000 - 000002.
