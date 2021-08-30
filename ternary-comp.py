@@ -60,9 +60,9 @@ class Trident():
         #reads the file a tryte at a time
         for k in range(0,len(ternary),6):
             tryte = ternary[k:k+6]
-            Trident.memory[i+729] = tryte
+            Trident.memory[i+13] = tryte
             if debug_status.upper() == "DEBUG":
-                print("Loaded " + str(tryte) + " into " + str(i+729))
+                print("Loaded " + str(tryte) + " into " + str(i+13))
             i = i + 1
         return i
 
@@ -111,10 +111,11 @@ class Trident():
     def initialize():
         print("Initialize")
         #program starts here
-        Trident.pc = 729  #Trytes here, not trits
+        #Trident.pc = 729  #Trytes here, not trits
+        Trident.pc = 13 #program counter starts at tryte 13
         #opcode = "0"
         Trident.registers = [0,0,0,0,0,0,0,0,0,[0,0,0]]
-        Trident.sp = 0
+        Trident.sp = 0 #stack pointer
         Trident.memory = [0]*6813
         #Initialize fonts and/or OS, whatever the system should have built in
         #here
@@ -133,10 +134,13 @@ class Trident():
         operand2 = Trident.memory[Trident.pc + 2]
         operand3 = Trident.memory[Trident.pc + 3]
 
-        #make it easier to use flags
+        #make it easier to use flags by assigning them to variable
         flags = Trident.registers[9]
         
         #And now, the long if-else chain!
+
+        
+        print(tribble) #uncomment this for debugging
 
         #000 = JP, or "Jump".
         #See opcode documentation for more details
@@ -223,7 +227,7 @@ class Trident():
             Trident.pc = Trident.pc + 2
         #CP
         elif tribble == "110":
-            if int(convert(operand1)) == Trident.registers[0]:
+            if int(convert(operand1,3,10)) == Trident.registers[0]:
                 flags[1] = 2
             else:
                 flags[1] = 0
@@ -254,7 +258,7 @@ class Trident():
             op1 = int(str1)
             str2 = convert(operand2,3,10)
             op2 = int(str2)
-            if registers[op1] != op2:
+            if Trident.registers[op1] != op2:
                 pass
             Trident.pc = Trident.pc + 3
         #SE
@@ -264,8 +268,13 @@ class Trident():
             str2 = convert(operand2,3,10)
             op2 = int(str2)
             if Trident.registers[op1] == Trident.registers[op2]:
-                pass
-            Trident.pc = Trident.pc + 3
+                """try:
+                    Trident.cycle()
+                except RecursionError:
+                    print("Infinite Loop Error")"""
+                Trident.pc = Trident.pc + 7
+            else:
+                Trident.pc = Trident.pc + 3
         #PUSH
         elif tribble == "201":
             str1 = convert(operand1,3,10)
@@ -330,7 +339,13 @@ class Trident():
             loc = location1 + location2
             endreg = int(strendreg)
             for j in range(endreg):
-                Trident.memory[loc + j] = Trident.registers[j]
+                converted = convert(str(Trident.registers[j]),10,3)
+                if len(converted) == 1:
+                    converted = "00" + converted
+                elif len(converted) == 2:
+                    converted = "0" + converted
+                Trident.memory[loc + j] = converted
+                print("Loaded " + converted + " into " + str(loc+j))
                 #print("mem[loc+j] = " + str(Trident.memory[loc+j]))
             Trident.pc = Trident.pc + 4
         #LDS
@@ -360,7 +375,8 @@ class Trident():
             if flags[op1] == 2:
                 addr = op2 + op3
                 Trident.pc = addr
-            Trident.pc = Trident.pc + 4
+            else:
+                Trident.pc = Trident.pc + 4
                 
         else:
             print("Unknown opcode")
