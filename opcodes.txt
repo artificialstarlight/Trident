@@ -83,8 +83,9 @@ appreciated.
 			  specified register is not equal to
 			  the operand.
 
-200 rrrrrr ssssss [SE] - Skips next instruction if the two
+200 rrrrrr rrrrrr [SE] - Skips next instruction* if the two
 			 specified registers are equal.
+		         * Increases program counter by 7. Code accordingly.
 
 201 rrrrrr [PUSH] - Pushes the value of the register onto the
 		    stack. The stack pointer is 
