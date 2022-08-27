@@ -5,13 +5,16 @@ May be bugs, please let me know if any are found.
 
 # Usage
 
-Run .\ternary-comp.exe FILENAME.tri
+To use, you must have created or use an existing .tri file containing machine code instructions to tell Trident what to do.
+(See "opcodes.txt")
 
-Or drag the filename.tri over the .exe. 
+Run ```.\ternary-comp.exe FILENAME.tri```
 
-Optional argument DEBUG for..debugging .tri programs.
+Or drag the ```filename.tri``` over the .exe. 
 
-Like this: .\ternary-comp.exe FILENAME.tri DEBUG
+Optional argument DEBUG for debugging .tri programs.
+
+Like this: ```.\ternary-comp.exe FILENAME.tri DEBUG```
 
 # Documentation
 See "opcodes.txt" for documentation on the machine instruction Trident uses.
@@ -30,4 +33,4 @@ It also ignores (most) comments. Single-line comments are allowed by using a sem
 
 Command line syntax to use it is:
 
-"python Assembler.py input-file-name.txt output-file-name.tri"
+```python Assembler.py input-file-name.txt output-file-name.tri```
