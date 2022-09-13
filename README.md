@@ -60,7 +60,9 @@ There may be bugs in this also. Please let me know if any are found so I can fix
 It is the idea that:
 
 0 - negative voltage
+
 1- no voltage
+
 2 - positive voltage
 
 Ternary logic gates can be implemented using existing technologies such as standard transistors.
