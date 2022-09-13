@@ -62,7 +62,7 @@ class Trident():
             tryte = ternary[k:k+6]
             Trident.memory[i+13] = tryte
             if debug_status.upper() == "DEBUG":
-                print("Loaded " + str(tryte) + " into " + str(i+13))
+                print("Loaded tryte " + str(tryte) + " into memory location " + str(i+13))
             i = i + 1
         return i
 
@@ -139,8 +139,17 @@ class Trident():
         
         #And now, the long if-else chain!
 
-        
-        print(tribble) #uncomment this for debugging
+        cmds_dict = {"JP":"000","AND":"001","OR":"002","XOR":"003",
+                     "NOT":"011","PTI":"012","NTI":"020","SUM":"021",
+                     "LDR":"022","LD":"100",
+                     "ADD":"101","SUB":"102","CP":"110","INC":"111",
+                     "DEC":"112","NOP":"120","CLS":"121",
+                     "SNE":"122","SE":"200",
+                     "PUSH":"201","POP":"202","RET":"210",
+                     "DRW":"211","LDM":"212","LDS":"220","KEY":"221","JC":"222"
+                     }
+        print(list(cmds_dict.keys())[list(cmds_dict.values()).index(tribble)])
+        #print(tribble) 
 
         #000 = JP, or "Jump".
         #See opcode documentation for more details
@@ -251,7 +260,8 @@ class Trident():
         #CLS
         elif tribble == "121":
             screen.fill(background_colour)
-            Trident.pc = Trident.pc + 2
+            pygame.display.flip()
+            Trident.pc = Trident.pc + 1
         #SNE
         elif tribble == "122":
             str1 = convert(operand1,3,10)
