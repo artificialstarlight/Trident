@@ -5,7 +5,7 @@ May be bugs, please let me know if any are found.
 
 # Usage
 
-To use, you must have created or use an existing .tri file containing machine code instructions to tell Trident what to do.
+To use, you must have created or use an existing ```.tri``` file containing machine code instructions to tell Trident what to do.
 (See "opcodes.txt")
 
 Run ```.\ternary-comp.exe FILENAME.tri```
