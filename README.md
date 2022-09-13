@@ -16,6 +16,10 @@ Optional argument DEBUG for debugging .tri programs.
 
 Like this: ```.\ternary-comp.exe FILENAME.tri DEBUG```
 
+If you choose to run the ```ternary-comp.py``` file instead of the ```.exe```, make sure ```logic-and-base-conversion.py``` is in the same directory.
+
+The ```.exe``` was compiled using PyInstaller. Therefore, some systems may flag it as a false positive for virus. It is not.
+
 # Documentation
 See ```opcodes.txt``` for documentation on the machine instruction Trident uses.
 
