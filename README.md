@@ -25,7 +25,9 @@ See ```opcodes.txt``` for documentation on the machine instruction Trident uses.
 
 The ```Assembler.py``` file can convert a ```.txt``` file of valid Trident assembly instructions into a ```.tri``` file, which will contain ternary machine code on one line, no spaces. Ternary machine code uses 0's, 1's and 2's, similar to Binary which uses only 0's and 1's. 
 
-The included ```.tri``` files are tests. draw-test.tri should draw a block sprite. 
+The included ```.tri``` files are tests. ```draw-test.tri``` should draw a block sprite. 
+
+```rng.tri``` implements a pseudorandom RNG function, and uses it to move a block sprite to a random location on the screen when a key is pressed.
 
 ```keyboard-test.tri``` ends the program when a key is pressed.
 
