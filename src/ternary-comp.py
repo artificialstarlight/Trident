@@ -214,14 +214,13 @@ class Trident():
         elif tribble == "101":
             str1 = convert(operand1,3,10)
             op1 = int(str1)
-            if Trident.registers[0] + Trident.registers[op1] <= 728:
+            #if there's no overflow
+            if Trident.registers[0] + Trident.registers[op1] <=728:
                 Trident.registers[0] = Trident.registers[0] + Trident.registers[op1]
                 flags[2] = 0
+            #if there's overflow
             else:
-                last_tryte3 = int(str(operand1)[-6:])
-                last_tryte_tup = convert(last_tryte3,3,10)
-                last_tryte = int(''.join(map(str, last_tryte_tup)))
-                Trident.registers[0] = last_tryte
+                Trident.registers[0] = (Trident.registers[0] + Trident.registers[op1]) - 729
                 flags[2] = 2
             Trident.pc = Trident.pc + 2
         #SUB
@@ -289,14 +288,16 @@ class Trident():
         elif tribble == "201":
             str1 = convert(operand1,3,10)
             op1 = int(str1)
-            Trident.memory[Trident.sp] = Trident.registers[op1]
+            #Trident.memory[Trident.sp] = Trident.registers[op1]
+            Trident.stack[Trident.sp] = Trident.registers[op1]
             Trident.sp = Trident.sp - 1
             Trident.pc = Trident.pc + 2
         #POP
         elif tribble == "202":
             str1 = convert(operand1,3,10)
             op1 = int(str1)
-            Trident.registers[op1] = Trident.memory[Trident.sp]
+            #Trident.registers[op1] = Trident.memory[Trident.sp]
+            Trident.registers[op1] = Trident.stack[Trident.sp]
             Trident.sp = Trident.sp + 1
             Trident.pc = Trident.pc + 2
         #RET
@@ -348,14 +349,21 @@ class Trident():
             location2 = int(strlocation2)
             loc = location1 + location2
             endreg = int(strendreg)
-            for j in range(endreg):
-                converted = convert(str(Trident.registers[j]),10,3)
-                if len(converted) == 1:
-                    converted = "00" + converted
-                elif len(converted) == 2:
-                    converted = "0" + converted
-                Trident.memory[loc + j] = converted
-                print("Loaded " + converted + " into " + str(loc+j))
+            if endreg!= 0:
+                for j in range(endreg):
+                    converted = convert(str(Trident.registers[j]),10,3)
+                    for n in range(7):
+                        if len(converted) < n:
+                            converted = "0" + converted
+                    Trident.memory[loc + j] = converted
+                    print("LDM-Loaded " + converted + " into " + str(loc+j))
+            else:
+                converted = convert(str(Trident.registers[0]),10,3)
+                for n in range(7):
+                    if len(converted) < n:
+                        converted = "0" + converted
+                Trident.memory[loc] = converted
+                print("Loaded (using LDM)- " + converted + " into " + str(loc))
                 #print("mem[loc+j] = " + str(Trident.memory[loc+j]))
             Trident.pc = Trident.pc + 4
         #LDS
